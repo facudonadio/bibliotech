@@ -7,7 +7,14 @@
  * @date Octubre 2026
  */
 
- document.addEventListener('DOMContentLoaded', loadUsers);
+let adminBookCategories = [];
+
+ document.addEventListener('DOMContentLoaded', async () =>
+ {
+     await loadAdminCategories();
+     loadUsers();
+     loadAdminBooks();
+ });
 
  /**
   * @brief Solicita al servidor el listado de usuarios y delega la renderización.
@@ -26,6 +33,82 @@
      }
  }
  
+
+ /**
+  * @brief Carga las categorías disponibles para los formularios de edición.
+  */
+ async function loadAdminCategories()
+ {
+     try
+     {
+         adminBookCategories = await apiService.request('/categories', 'GET');
+     }
+     catch (error)
+     {
+         showModal('Error', 'No se pudieron cargar las categorías: ' + error.message);
+     }
+ }
+
+ /**
+  * @brief Obtiene todos los libros mediante el endpoint exclusivo de administración.
+  */
+ async function loadAdminBooks()
+ {
+     try
+     {
+         const books = await apiService.request('/admin/books', 'GET');
+         renderAdminBooksTable(books);
+     }
+     catch (error)
+     {
+         showModal('Error', 'No se pudieron cargar los libros: ' + error.message);
+     }
+ }
+
+ /**
+  * @brief Renderiza los libros globales y agrega la acción de edición.
+  * @param {Array} books - Libros devueltos por el backend.
+  */
+ function renderAdminBooksTable(books)
+ {
+     const tbody = document.getElementById('booksTableBody');
+     tbody.replaceChildren();
+
+     books.forEach(book =>
+     {
+         const row = document.createElement('tr');
+         const values = [
+             book.id, book.title, book.author, book.category,
+             book.pages, book.owner_username
+         ];
+
+         values.forEach(value =>
+         {
+             const cell = document.createElement('td');
+             cell.textContent = value;
+             row.appendChild(cell);
+         });
+
+         const actions = document.createElement('td');
+         const editButton = document.createElement('button');
+         editButton.className = 'w3-button w3-blue w3-tiny w3-round';
+         editButton.textContent = 'Editar';
+         editButton.addEventListener('click', () =>
+         {
+             bookEditor.open(book, adminBookCategories, async metadata =>
+             {
+                 await apiService.request(`/books/${book.id}`, 'PUT', metadata);
+                 showModal('Actualizado', 'Los metadatos se actualizaron correctamente.');
+                 await loadAdminBooks();
+             });
+         });
+
+         actions.appendChild(editButton);
+         row.appendChild(actions);
+         tbody.appendChild(row);
+     });
+ }
+
  /**
   * @brief Renderización segura de usuarios iterando sobre el array y creando nodos DOM.
   * @param {Array} users - Lista de objetos de usuario retornada por la API.

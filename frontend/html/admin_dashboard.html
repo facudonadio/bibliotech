@@ -40,11 +40,33 @@
             </tbody>
         </table>
     </div>
+
+ 
+    <h2 class="w3-text-white w3-margin-top">Todos los libros</h2>
+    <p>El administrador puede consultar y editar los metadatos de cualquier libro.</p>
+    <div class="w3-responsive">
+        <table class="w3-table w3-striped w3-bordered vault-card">
+            <thead>
+                <tr class="w3-teal">
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoría</th>
+                    <th>Páginas</th>
+                    <th>Propietario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="booksTableBody">
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script src="../js/services/api_service.js"></script>
 <script src="../js/utils/auth_helper.js"></script>
 <script src="../js/components/ui_handlers.js"></script>
+<script src="../js/components/book_editor.js"></script>
 <script src="../js/front_controllers/admin_front_controller.js"></script>
 </body>
 </html>

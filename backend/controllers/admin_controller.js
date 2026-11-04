@@ -82,6 +82,25 @@
              next(error);
          }
      }
+ 
+     /**
+      * @brief Obtiene todos los libros para que el administrador pueda gestionarlos.
+      * @param {Object} req - Petición HTTP autenticada como administrador.
+      * @param {Object} res - Respuesta HTTP.
+      * @param {Function} next - Delegación de errores.
+      */
+     async getAllBooks(req, res, next)
+     {
+         try
+         {
+             const books = await bookRepository.findAll();
+             res.json(books);
+         }
+         catch (error)
+         {
+             next(error);
+         }
+     }
  }
  
  module.exports = new AdminController();
