@@ -7,6 +7,8 @@
  * @date Octubre 2026
  */
 
+let bookCategories = [];
+
  document.addEventListener('DOMContentLoaded', () =>
  {
      loadBooks();
@@ -24,6 +26,7 @@ async function loadCategories()
     try
     {
         const categories = await apiService.request('/categories', 'GET');
+        bookCategories = categories;
         select.replaceChildren();
 
         const placeholder = document.createElement('option');
@@ -114,6 +117,21 @@ async function loadCategories()
              deleteBook(b.id);
          });
          tdActions.appendChild(btnDelete);
+
+ 
+         const btnEdit = document.createElement('button');
+         btnEdit.className = 'w3-button w3-blue w3-tiny w3-round w3-margin-right';
+         btnEdit.textContent = 'Editar';
+         btnEdit.addEventListener('click', () =>
+         {
+             bookEditor.open(b, bookCategories, async metadata =>
+             {
+                 await apiService.request(`/books/${b.id}`, 'PUT', metadata);
+                 showModal('Actualizado', 'Los metadatos se actualizaron correctamente.');
+                 await loadBooks();
+             });
+         });
+         tdActions.insertBefore(btnEdit, btnDelete);
  
          row.append(tdTitle, tdAuthor, tdCategory, tdPages, tdReading, tdActions);
          tbody.appendChild(row);
