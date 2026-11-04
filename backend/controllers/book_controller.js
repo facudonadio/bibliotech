@@ -27,7 +27,7 @@
      {
          try 
          {
-             const { title, author, category, pages } = req.body;
+             const { title, author, category_id, pages } = req.body;
              const userId = req.userId;
              const filename = req.file.filename;
              const filePath = `/uploads/${filename}`;
@@ -38,7 +38,7 @@
                  filename,
                  title,
                  author,
-                 category,
+                 category_id,
                  pages: parseInt(pages) || 0,
                  file_path: filePath
              });
