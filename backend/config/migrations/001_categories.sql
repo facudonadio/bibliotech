@@ -25,11 +25,14 @@ ALTER TABLE books ADD COLUMN category_id INT NULL AFTER category;
 -- Conservamos el significado de las categorías conocidas y agrupamos las restantes en 'Otros'.
 UPDATE books AS b
 LEFT JOIN categories AS c
-    ON TRIM(b.category) COLLATE utf8mb4_unicode_ci = c.name
+    ON CONVERT(TRIM(b.category) USING utf8mb4) COLLATE utf8mb4_unicode_ci = c.name
 SET b.category_id = COALESCE(
     c.id,
     (SELECT other_category.id FROM categories AS other_category WHERE other_category.name = 'Otros')
 );
+
+-- Conservamos el texto original como respaldo sin duplicar el nombre category en las consultas.
+ALTER TABLE books CHANGE COLUMN category category_legacy VARCHAR(50) NULL;
 
 -- Una vez migradas las filas, imponemos la integridad referencial.
 ALTER TABLE books
