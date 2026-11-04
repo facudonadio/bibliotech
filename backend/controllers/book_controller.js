@@ -102,9 +102,6 @@
              // Eliminar registro en base de datos
              await bookRepository.delete(id, userId);
  
-             // Eliminar archivo físico en disco de forma síncrona
-             fileHelper.deleteFile(book.file_path);
-
              // Registrar la acción fuera del flujo crítico para no revertir la eliminación
              // si el servicio de auditoría presenta una falla independiente.
              auditRepository.create({
@@ -115,7 +112,12 @@
              }).catch(error =>
              {
                  console.error('[Audit] No se pudo registrar DELETE_BOOK:', error);
-             }); 
+             });
+
+             // Eliminar archivo físico en disco de forma síncrona
+             fileHelper.deleteFile(book.file_path);
+
+ 
              
              const message = i18n.getMessage('CT_BOOK_DELETED_SUCCESS');
              res.json({ message });
