@@ -145,6 +145,10 @@
              validator.validateThis(category_id).with(new Required("CT_REQ_CATEGORY"));
              validator.validateThis(pages).with(new PositiveNumber("CT_PAGES_POSITIVE"));
 
+             if (typeof title !== 'string' || typeof author !== 'string')
+             {
+                 throw new Error('El título y el autor deben ser textos válidos.');
+             }
              if (title.trim().length > 100 || author.trim().length > 100)
              {
                  throw new Error('El título y el autor no pueden superar los 100 caracteres.');
