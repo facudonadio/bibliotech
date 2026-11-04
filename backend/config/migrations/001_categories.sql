@@ -3,7 +3,7 @@
  * @brief Migra categorías de texto a una tabla normalizada.
  * @project Bibliotech
  * @details Ejecutar UNA SOLA VEZ sobre una base bibliotech existente y con respaldo previo.
- *          No elimina ni recrea la base de datos, usuarios, libros ni la columna category antigua.
+ *          No elimina ni recrea la base de datos, usuarios o libros; conserva el texto antiguo como category_legacy.
  *          Categorías desconocidas o nulas se asignan a 'Otros'.
  */
 USE bibliotech;
