@@ -73,6 +73,34 @@
          await db.execute('CALL sp_delete_book(?, ?)', [id, userId]);
          return true;
      }
+ 
+     /**
+      * @brief Actualiza los metadatos sin modificar el archivo PDF.
+      * @param {number} id - Identificador del libro.
+      * @param {number} userId - Usuario autenticado.
+      * @param {boolean} isAdmin - Indica si el usuario es administrador.
+      * @param {Object} metadata - Metadatos validados.
+      * @returns {Promise<Object|undefined>} Libro actualizado o undefined si no existe/no tiene permiso.
+      */
+     async updateMetadata(id, userId, isAdmin, metadata)
+     {
+         const { title, author, category_id, pages } = metadata;
+         const [rows] = await db.execute(
+             'CALL sp_update_book_metadata(?, ?, ?, ?, ?, ?, ?)',
+             [id, userId, isAdmin ? 1 : 0, title, author, category_id, pages]
+         );
+         return rows[0][0];
+     }
+
+     /**
+      * @brief Obtiene todos los libros para la gestión administrativa.
+      * @returns {Promise<Array>} Libros con su categoría y propietario.
+      */
+     async findAll()
+     {
+         const [rows] = await db.execute('CALL sp_find_all_books_v2()');
+         return rows[0];
+     }
  }
  
  module.exports = new BookRepository();
