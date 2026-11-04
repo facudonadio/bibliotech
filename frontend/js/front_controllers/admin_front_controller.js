@@ -9,11 +9,11 @@
 
 let adminBookCategories = [];
 
- document.addEventListener('DOMContentLoaded', () =>
+ document.addEventListener('DOMContentLoaded', async () =>
  {
+     await loadAdminCategories();
      loadUsers();
      loadAdminBooks();
-     loadAdminCategories();
  });
 
  /**
