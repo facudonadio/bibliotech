@@ -122,6 +122,52 @@
              return res.status(400).json({ message: error.message });
          }
      }
+ 
+     /**
+      * @brief Valida el ID y los metadatos enviados para editar un libro.
+      * @details Esta ruta recibe JSON y nunca procesa archivos PDF.
+      */
+     validateBookMetadata: (req, res, next) =>
+     {
+         const validator = new Validator();
+         const { title, author, category_id, pages } = req.body;
+         const bookId = Number(req.params.id);
+
+         try
+         {
+             if (!Number.isInteger(bookId) || bookId <= 0)
+             {
+                 throw new Error('El identificador del libro no es válido.');
+             }
+
+             validator.validateThis(title).with(new Required("CT_REQ_TITLE"));
+             validator.validateThis(author).with(new Required("CT_REQ_AUTHOR"));
+             validator.validateThis(category_id).with(new Required("CT_REQ_CATEGORY"));
+             validator.validateThis(pages).with(new PositiveNumber("CT_PAGES_POSITIVE"));
+
+             if (title.trim().length > 100 || author.trim().length > 100)
+             {
+                 throw new Error('El título y el autor no pueden superar los 100 caracteres.');
+             }
+             if (!Number.isInteger(Number(category_id)) || Number(category_id) <= 0)
+             {
+                 throw new Error('La categoría seleccionada no es válida.');
+             }
+             if (!Number.isInteger(Number(pages)) || Number(pages) <= 0)
+             {
+                 throw new Error('La cantidad de páginas debe ser un entero positivo.');
+             }
+
+             req.params.id = bookId;
+             req.body.category_id = Number(category_id);
+             req.body.pages = Number(pages);
+             next();
+         }
+         catch (error)
+         {
+             return res.status(400).json({ message: error.message });
+         }
+     }
  };
  
  module.exports = validationMiddleware;
