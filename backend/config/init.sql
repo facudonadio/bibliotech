@@ -17,7 +17,7 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
--- 1. Borrar la base de datos si existe y crearla limpia
+-- 1. Crear la base de datos si todavía no existe (sin borrar datos existentes)
 CREATE DATABASE IF NOT EXISTS bibliotech CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bibliotech;
 
