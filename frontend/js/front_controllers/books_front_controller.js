@@ -9,10 +9,10 @@
 
 let bookCategories = [];
 
- document.addEventListener('DOMContentLoaded', () =>
+ document.addEventListener('DOMContentLoaded', async () =>
  {
-     loadBooks();
-     loadCategories();
+     await loadCategories();
+     await loadBooks();
  });
 
 /**
