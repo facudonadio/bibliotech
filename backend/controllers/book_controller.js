@@ -112,6 +112,39 @@
              next(error);
          }
      }
+ 
+     /**
+      * @brief Actualiza los metadatos de un libro sin recibir ni modificar el PDF.
+      * @param {Object} req - Petición autenticada con ID y metadatos validados.
+      * @param {Object} res - Respuesta HTTP.
+      * @param {Function} next - Delegación de errores.
+      */
+     async updateBookMetadata(req, res, next)
+     {
+         try
+         {
+             const { id } = req.params;
+             const userId = req.userId;
+             const roles = req.userRole;
+             const isAdmin = Array.isArray(roles) ? roles.includes('admin') : roles === 'admin';
+
+             const updatedBook = await bookRepository.updateMetadata(
+                 id, userId, isAdmin, req.body
+             );
+
+             if (!updatedBook)
+             {
+                 const message = i18n.getMessage('CT_BOOK_NOT_FOUND');
+                 return res.status(404).json({ message });
+             }
+
+             res.json({ message: 'Metadatos actualizados correctamente.' });
+         }
+         catch (error)
+         {
+             next(error);
+         }
+     }
  }
  
  module.exports = new BookController();
