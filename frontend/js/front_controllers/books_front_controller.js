@@ -7,7 +7,45 @@
  * @date Octubre 2026
  */
 
- document.addEventListener('DOMContentLoaded', loadBooks);
+ document.addEventListener('DOMContentLoaded', () =>
+ {
+     loadBooks();
+     loadCategories();
+ });
+
+/**
+ * @brief Consulta la API y construye las opciones del selector de categorías.
+ * @details Se crean nodos DOM y se asigna textContent para evitar insertar HTML no confiable.
+ */
+async function loadCategories()
+{
+    const select = document.getElementById('category');
+
+    try
+    {
+        const categories = await apiService.request('/categories', 'GET');
+        select.replaceChildren();
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Seleccioná una categoría';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        select.appendChild(placeholder);
+
+        categories.forEach(category =>
+        {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        });
+    }
+    catch (error)
+    {
+        showModal('Error', 'No se pudieron cargar las categorías: ' + error.message);
+    }
+}
 
  async function loadBooks() 
  {
@@ -123,7 +161,7 @@
         const formData = new FormData();
         formData.append('title', document.getElementById('title').value);
         formData.append('author', document.getElementById('author').value);
-        formData.append('category', document.getElementById('category').value);
+        formData.append('category_id', document.getElementById('category').value);
         formData.append('pages', document.getElementById('pages').value);
         
         // files[0] accede al binario crudo del archivo seleccionado en el input de tipo file
