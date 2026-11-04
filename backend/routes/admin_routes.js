@@ -37,4 +37,11 @@
   */
  router.delete('/users/:id', adminController.deleteUser);
  
+ 
+ /**
+  * @route GET /api/admin/books
+  * @brief Lista todos los libros para la gestión administrativa.
+  */
+ router.get('/books', adminController.getAllBooks);
+
  module.exports = router;
