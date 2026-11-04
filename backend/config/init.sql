@@ -189,7 +189,7 @@ END //
 /*
  * @brief Registra los metadatos de un archivo PDF subido al servidor.
  */
-CREATE PROCEDURE sp_create_book(
+CREATE PROCEDURE sp_create_book_v2(
     IN p_user_id INT,
     IN p_filename VARCHAR(255),
     IN p_title VARCHAR(100),
@@ -205,7 +205,7 @@ BEGIN
 END //
 
 -- Listar libros asociados a un usuario específico
-CREATE PROCEDURE sp_find_books_by_user(IN p_user_id INT)
+CREATE PROCEDURE sp_find_books_by_user_v2(IN p_user_id INT)
 BEGIN
     SELECT b.*, c.name AS category
     FROM books b JOIN categories c ON b.category_id = c.id
@@ -217,7 +217,7 @@ END //
  * @note Seguridad: Se exige el p_user_id para evitar que un cliente modifique 
  * un id en la URL y acceda a un libro que no le pertenece (Insecure Direct Object Reference).
  */
-CREATE PROCEDURE sp_find_book_by_id(IN p_id INT, IN p_user_id INT)
+CREATE PROCEDURE sp_find_book_by_id_v2(IN p_id INT, IN p_user_id INT)
 BEGIN
     SELECT b.*, c.name AS category
     FROM books b JOIN categories c ON b.category_id = c.id
