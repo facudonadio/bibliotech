@@ -7,10 +7,10 @@
  * @date Octubre 2026
  */
 
-/* 
- * @details Configuración inicial del entorno. 
- * Desactivar 'foreign_key_checks' temporalmente permite borrar y recrear tablas 
- * sin preocuparnos por el orden estricto de las dependencias relacionales.
+/*
+ * @details Configuración inicial del entorno.
+ * Durante el bootstrap se suspenden temporalmente las comprobaciones de claves
+ * foráneas mientras se construye el esquema completo.
  */
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
