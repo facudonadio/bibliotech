@@ -18,8 +18,7 @@ SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 -- 1. Borrar la base de datos si existe y crearla limpia
-DROP DATABASE IF EXISTS bibliotech;
-CREATE DATABASE bibliotech;
+CREATE DATABASE IF NOT EXISTS bibliotech CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE bibliotech;
 
 /*
@@ -41,6 +40,16 @@ CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(20) NOT NULL UNIQUE
 );
+
+-- Tabla de Categorías (catálogo dinámico)
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO categories (name) VALUES
+    ('Novela'), ('Ciencia Ficción'), ('Técnico / Académico'),
+    ('Historia'), ('Poesía'), ('Otros');
 
 -- Tabla de Usuarios
 CREATE TABLE users (
@@ -74,11 +83,12 @@ CREATE TABLE books (
     filename VARCHAR(255) NOT NULL,
     title VARCHAR(100) NOT NULL,
     author VARCHAR(100) NOT NULL,
-    category VARCHAR(50),
+    category_id INT NOT NULL,
     pages INT DEFAULT 0,
     file_path VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
 -- 7. Inserción de Roles Maestros
@@ -164,6 +174,16 @@ BEGIN
     DELETE FROM users WHERE id = p_id;
 END //
 
+-- --- PROCEDIMIENTOS PARA CATEGORIES ---
+
+/**
+ * @brief Devuelve el catálogo de categorías disponible para los formularios.
+ */
+CREATE PROCEDURE sp_get_all_categories()
+BEGIN
+    SELECT id, name FROM categories ORDER BY id;
+END //
+
 -- --- PROCEDIMIENTOS PARA BOOKS ---
 
 /*
@@ -174,20 +194,22 @@ CREATE PROCEDURE sp_create_book(
     IN p_filename VARCHAR(255),
     IN p_title VARCHAR(100),
     IN p_author VARCHAR(100),
-    IN p_category VARCHAR(50),
+    IN p_category_id INT,
     IN p_pages INT,
     IN p_file_path VARCHAR(255)
 )
 BEGIN
-    INSERT INTO books (user_id, filename, title, author, category, pages, file_path)
-    VALUES (p_user_id, p_filename, p_title, p_author, p_category, p_pages, p_file_path);
+    INSERT INTO books (user_id, filename, title, author, category_id, pages, file_path)
+    VALUES (p_user_id, p_filename, p_title, p_author, p_category_id, p_pages, p_file_path);
     SELECT LAST_INSERT_ID() as insertId;
 END //
 
 -- Listar libros asociados a un usuario específico
 CREATE PROCEDURE sp_find_books_by_user(IN p_user_id INT)
 BEGIN
-    SELECT * FROM books WHERE user_id = p_user_id;
+    SELECT b.*, c.name AS category
+    FROM books b JOIN categories c ON b.category_id = c.id
+    WHERE b.user_id = p_user_id;
 END //
 
 /*
@@ -197,7 +219,9 @@ END //
  */
 CREATE PROCEDURE sp_find_book_by_id(IN p_id INT, IN p_user_id INT)
 BEGIN
-    SELECT * FROM books WHERE id = p_id AND user_id = p_user_id;
+    SELECT b.*, c.name AS category
+    FROM books b JOIN categories c ON b.category_id = c.id
+    WHERE b.id = p_id AND b.user_id = p_user_id;
 END //
 
 /*
