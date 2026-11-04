@@ -121,8 +121,8 @@
              }
              return res.status(400).json({ message: error.message });
          }
-     }
- 
+     },
+
      /**
       * @brief Valida el ID y los metadatos enviados para editar un libro.
       * @details Esta ruta recibe JSON y nunca procesa archivos PDF.
