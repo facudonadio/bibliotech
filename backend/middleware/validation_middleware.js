@@ -100,7 +100,10 @@
              validator.validateThis(title).with(new Required("CT_REQ_TITLE"));
              validator.validateThis(author).with(new Required("CT_REQ_AUTHOR"));
              validator.validateThis(category_id).with(new Required("CT_REQ_CATEGORY"));
-             validator.validateThis(category_id).with(new PositiveNumber("CT_CATEGORY_INVALID"));
+             if (!Number.isInteger(Number(category_id)) || Number(category_id) <= 0)
+             {
+                 throw new Error("La categoría seleccionada no es válida.");
+             }
              validator.validateThis(pages).with(new PositiveNumber("CT_PAGES_POSITIVE"));
  
              next();
