@@ -71,17 +71,21 @@
                  return res.status(404).json({ message });
              }
  
-             // Registrar quién eliminó la cuenta y qué usuario fue afectado.
-             // La promesa no se espera para que una falla de auditoría no bloquee la respuesta.
-             auditRepository.create({
-                 user_id: adminId,
-                 action: 'DELETE_USER',
-                 target: String(targetUserId),
-                 ip_address: req.ip || null
-             }).catch(error =>
+             // Esperar el intento de auditoría antes de limpiar los archivos físicos.
+             // Una falla de auditoría se registra, pero no revierte la eliminación de la cuenta.
+             try
+             {
+                 await auditRepository.create({
+                     user_id: adminId,
+                     action: 'DELETE_USER',
+                     target: String(targetUserId),
+                     ip_address: req.ip || null
+                 });
+             }
+             catch (error)
              {
                  console.error('[Audit] No se pudo registrar DELETE_USER:', error);
-             });
+             }
 
              // Limpieza física: Eliminar almacenamiento en disco
              userBooks.forEach(book => {fileHelper.deleteFile(book.file_path);});
