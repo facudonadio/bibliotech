@@ -91,6 +91,18 @@ CREATE TABLE books (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+-- Tabla de auditoría (sin FK a users para conservar el historial al eliminar cuentas)
+CREATE TABLE audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    target VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_audit_user_date (user_id, created_at),
+    INDEX idx_audit_action_date (action, created_at)
+);
+
 -- 7. Inserción de Roles Maestros
 INSERT INTO roles (name) VALUES ('admin'), ('client');
 
@@ -272,6 +284,22 @@ END //
      JOIN users u ON b.user_id = u.id
      ORDER BY b.id DESC;
  END //
+
+-- --- PROCEDIMIENTO PARA AUDITORÍA ---
+/*
+ * @brief Registra un evento de auditoría asociado a una acción crítica.
+ * @details No utiliza FK hacia users para preservar el historial de cuentas eliminadas.
+ */
+CREATE PROCEDURE sp_create_audit_log(
+    IN p_user_id INT,
+    IN p_action VARCHAR(50),
+    IN p_target VARCHAR(255),
+    IN p_ip_address VARCHAR(45)
+)
+BEGIN
+    INSERT INTO audit_logs (user_id, action, target, ip_address)
+    VALUES (p_user_id, p_action, p_target, p_ip_address);
+END //
 
 DELIMITER ;
 SET foreign_key_checks = 1;

@@ -9,6 +9,7 @@
 
  const fileHelper = require('../utils/file_helper/file_helper');
  const bookRepository = require('../repositories/book_repository');
+ const auditRepository = require('../repositories/audit_repository');
  const i18n = require('../utils/i18n/i18n'); // Inyección del gestor de idiomas
  
  /**
@@ -101,8 +102,26 @@
              // Eliminar registro en base de datos
              await bookRepository.delete(id, userId);
  
+             // Esperar el intento de auditoría antes de limpiar el archivo físico.
+             // Una falla de auditoría se registra, pero no revierte la eliminación del libro.
+             try
+             {
+                 await auditRepository.create({
+                     user_id: userId,
+                     action: 'DELETE_BOOK',
+                     target: String(id),
+                     ip_address: req.ip || null
+                 });
+             }
+             catch (error)
+             {
+                 console.error('[Audit] No se pudo registrar DELETE_BOOK:', error);
+             }
+
              // Eliminar archivo físico en disco de forma síncrona
-             fileHelper.deleteFile(book.file_path); 
+             fileHelper.deleteFile(book.file_path);
+
+ 
              
              const message = i18n.getMessage('CT_BOOK_DELETED_SUCCESS');
              res.json({ message });

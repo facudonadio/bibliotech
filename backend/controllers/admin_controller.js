@@ -11,6 +11,7 @@
  const bookRepository = require('../repositories/book_repository');
  const fileHelper = require('../utils/file_helper/file_helper');
  const i18n = require('../utils/i18n/i18n'); // Inyección del gestor de idiomas
+ const auditRepository = require('../repositories/audit_repository');
  
  /**
   * @class AdminController
@@ -70,8 +71,26 @@
                  return res.status(404).json({ message });
              }
  
+             // Esperar el intento de auditoría antes de limpiar los archivos físicos.
+             // Una falla de auditoría se registra, pero no revierte la eliminación de la cuenta.
+             try
+             {
+                 await auditRepository.create({
+                     user_id: adminId,
+                     action: 'DELETE_USER',
+                     target: String(targetUserId),
+                     ip_address: req.ip || null
+                 });
+             }
+             catch (error)
+             {
+                 console.error('[Audit] No se pudo registrar DELETE_USER:', error);
+             }
+
              // Limpieza física: Eliminar almacenamiento en disco
              userBooks.forEach(book => {fileHelper.deleteFile(book.file_path);});
+
+
  
              // Reemplazo dinámico (%s) para mostrar la cantidad de archivos borrados
              const message = i18n.getMessage('CT_ADMIN_USER_DELETED').replace('%s', userBooks.length);
