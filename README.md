@@ -76,7 +76,7 @@ bibliotech/
 │   │   └── view_routes.js               # Enrutador de pantallas HTML
 │   ├── uploads/                         # Directorio físico de almacenamiento PDF
 │   ├── utils/
-│   │   ├── db_utils/
+│   │   ├── dbutils/
 │   │   │   ├── db_check.js              # Script CLI de diagnóstico de conexión
 │   │   │   └── db_setup.js              # Inicialización automatizada (Bootstrap DB)
 │   │   ├── file_helper/
@@ -158,7 +158,7 @@ npm install
 Para crear automáticamente la base de datos `bibliotech`, el usuario con permisos de menor privilegio, las tablas y los Stored Procedures, ejecuta:
 
 ```bash
-node utils/db_utils/db_setup.js
+node utils/dbutils/db_setup.js
 ```
 
 *(Opcional: Si cuentas con una contraseña para el usuario root de MySQL, puedes importar manualmente el archivo `backend/config/init.sql` desde **phpMyAdmin**, **MySQL Workbench** o la consola de MySQL).*
