@@ -14,15 +14,15 @@ const db = require('../config/db');
 class AuditRepository
 {
     /**
-     * @brief Persiste un evento de auditoría y devuelve una promesa para esperar el resultado.
+     * @brief Persiste un evento de auditoría y espera la confirmación del procedimiento almacenado.
      * @param {Object} eventData Datos del evento de auditoría.
      * @param {number} eventData.user_id Usuario autenticado que realizó la acción.
      * @param {string} eventData.action Código estable de la acción.
      * @param {string} eventData.target Identificador del recurso afectado.
      * @param {string|null} eventData.ip_address IP disponible en la petición.
      * @returns {Promise<void>} Promesa que se resuelve cuando el SP confirma la inserción.
-     * @note El controlador espera esta promesa antes de continuar con la limpieza física.
-     *       Si el registro falla, captura el error y continúa con la eliminación.
+     * @note Los controladores esperan esta promesa antes de continuar con la limpieza física.
+     *       Si el registro falla, capturan el error y continúan con la eliminación.
      */
     async create(eventData)
     {
