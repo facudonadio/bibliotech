@@ -31,9 +31,9 @@
       */
      async create(bookData) 
      {
-         const { user_id, filename, title, author, category, pages, file_path } = bookData;
-         const [rows] = await db.execute('CALL sp_create_book(?, ?, ?, ?, ?, ?, ?)',
-             [user_id, filename, title, author, category, pages, file_path]);
+         const { user_id, filename, title, author, category_id, pages, file_path } = bookData;
+         const [rows] = await db.execute('CALL sp_create_book_v2(?, ?, ?, ?, ?, ?, ?)',
+             [user_id, filename, title, author, category_id, pages, file_path]);
              
          // Los Stored Procedures de inserción fueron diseñados para devolver LAST_INSERT_ID()
          return rows[0][0].insertId;
@@ -46,7 +46,7 @@
       */
      async findByUserId(userId) 
      {
-         const [rows] = await db.execute('CALL sp_find_books_by_user(?)', [userId]);
+         const [rows] = await db.execute('CALL sp_find_books_by_user_v2(?)', [userId]);
          return rows[0];
      }
  
@@ -58,7 +58,7 @@
       */
      async findById(id, userId) 
      {
-         const [rows] = await db.execute('CALL sp_find_book_by_id(?, ?)', [id, userId]);
+         const [rows] = await db.execute('CALL sp_find_book_by_id_v2(?, ?)', [id, userId]);
          return rows[0][0]; 
      }
  
@@ -72,6 +72,34 @@
      {
          await db.execute('CALL sp_delete_book(?, ?)', [id, userId]);
          return true;
+     }
+ 
+     /**
+      * @brief Actualiza los metadatos sin modificar el archivo PDF.
+      * @param {number} id - Identificador del libro.
+      * @param {number} userId - Usuario autenticado.
+      * @param {boolean} isAdmin - Indica si el usuario es administrador.
+      * @param {Object} metadata - Metadatos validados.
+      * @returns {Promise<Object|undefined>} Libro actualizado o undefined si no existe/no tiene permiso.
+      */
+     async updateMetadata(id, userId, isAdmin, metadata)
+     {
+         const { title, author, category_id, pages } = metadata;
+         const [rows] = await db.execute(
+             'CALL sp_update_book_metadata(?, ?, ?, ?, ?, ?, ?)',
+             [id, userId, isAdmin ? 1 : 0, title, author, category_id, pages]
+         );
+         return rows[0][0];
+     }
+
+     /**
+      * @brief Obtiene todos los libros para la gestión administrativa.
+      * @returns {Promise<Array>} Libros con su categoría y propietario.
+      */
+     async findAll()
+     {
+         const [rows] = await db.execute('CALL sp_find_all_books_v2()');
+         return rows[0];
      }
  }
  

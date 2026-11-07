@@ -27,7 +27,7 @@
      {
          try 
          {
-             const { title, author, category, pages } = req.body;
+             const { title, author, category_id, pages } = req.body;
              const userId = req.userId;
              const filename = req.file.filename;
              const filePath = `/uploads/${filename}`;
@@ -38,7 +38,7 @@
                  filename,
                  title,
                  author,
-                 category,
+                 category_id,
                  pages: parseInt(pages) || 0,
                  file_path: filePath
              });
@@ -106,6 +106,39 @@
              
              const message = i18n.getMessage('CT_BOOK_DELETED_SUCCESS');
              res.json({ message });
+         }
+         catch (error)
+         {
+             next(error);
+         }
+     }
+ 
+     /**
+      * @brief Actualiza los metadatos de un libro sin recibir ni modificar el PDF.
+      * @param {Object} req - Petición autenticada con ID y metadatos validados.
+      * @param {Object} res - Respuesta HTTP.
+      * @param {Function} next - Delegación de errores.
+      */
+     async updateBookMetadata(req, res, next)
+     {
+         try
+         {
+             const { id } = req.params;
+             const userId = req.userId;
+             const roles = req.userRole;
+             const isAdmin = Array.isArray(roles) ? roles.includes('admin') : roles === 'admin';
+
+             const updatedBook = await bookRepository.updateMetadata(
+                 id, userId, isAdmin, req.body
+             );
+
+             if (!updatedBook)
+             {
+                 const message = i18n.getMessage('CT_BOOK_NOT_FOUND');
+                 return res.status(404).json({ message });
+             }
+
+             res.json({ message: 'Metadatos actualizados correctamente.' });
          }
          catch (error)
          {

@@ -47,6 +47,7 @@
   */
  const authRoutes = require('./routes/auth_routes');
  const bookRoutes = require('./routes/book_routes');
+ const categoryRoutes = require('./routes/category_routes');
  const adminRoutes = require('./routes/admin_routes');
  const viewRoutes = require('./routes/view_routes');
  const testsRoutes = require('./routes/tests_routes');
@@ -93,6 +94,7 @@
  
  app.use('/api/auth', authRoutes);
  app.use('/api/books', bookRoutes);
+ app.use('/api/categories', categoryRoutes);
  app.use('/api/admin', adminRoutes);
  
  // --- 4. Enrutador de Vistas (UI o Testing) ---
