@@ -102,17 +102,21 @@
              // Eliminar registro en base de datos
              await bookRepository.delete(id, userId);
  
-             // Registrar la acción fuera del flujo crítico para no revertir la eliminación
-             // si el servicio de auditoría presenta una falla independiente.
-             auditRepository.create({
-                 user_id: userId,
-                 action: 'DELETE_BOOK',
-                 target: String(id),
-                 ip_address: req.ip || null
-             }).catch(error =>
+             // Esperar el intento de auditoría antes de limpiar el archivo físico.
+             // Una falla de auditoría se registra, pero no revierte la eliminación del libro.
+             try
+             {
+                 await auditRepository.create({
+                     user_id: userId,
+                     action: 'DELETE_BOOK',
+                     target: String(id),
+                     ip_address: req.ip || null
+                 });
+             }
+             catch (error)
              {
                  console.error('[Audit] No se pudo registrar DELETE_BOOK:', error);
-             });
+             }
 
              // Eliminar archivo físico en disco de forma síncrona
              fileHelper.deleteFile(book.file_path);
