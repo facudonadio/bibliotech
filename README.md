@@ -55,7 +55,7 @@ También se utiliza un middleware global para centralizar el tratamiento de erro
 
 ## ⧉ Estructura del proyecto
 
-\`\`\`text
+~~~text
 bibliotech/
 ├── backend/
 │   ├── config/
@@ -109,7 +109,7 @@ bibliotech/
 │       └── utils/
 ├── .gitignore
 └── README.md
-\`\`\`
+~~~
 
 ---
 
@@ -125,22 +125,22 @@ bibliotech/
 
 Cloná el repositorio y entrá en la carpeta del backend:
 
-\`\`\`bash
+~~~bash
 git clone https://github.com/facudonadio/bibliotech.git
 cd bibliotech/backend
-\`\`\`
+~~~
 
 ### 3. Configurar las variables de entorno
 
 En la carpeta backend/, copiá el archivo de ejemplo:
 
-\`\`\`bash
+~~~bash
 cp .env.example .env
-\`\`\`
+~~~
 
 Editá .env y configurá los valores correspondientes a tu instalación:
 
-\`\`\`env
+~~~env
 PORT=3000
 DB_HOST=localhost
 DB_USER=tu_usuario
@@ -148,7 +148,7 @@ DB_PASS=tu_contrasena
 DB_NAME=bibliotech
 JWT_SECRET=una_clave_secreta_larga_y_aleatoria
 NODE_ENV=development
-\`\`\`
+~~~
 
 No publiques el archivo .env ni compartas sus secretos. El repositorio incluye .env.example como plantilla; las credenciales reales deben configurarse localmente.
 
@@ -156,9 +156,9 @@ No publiques el archivo .env ni compartas sus secretos. El repositorio incluye .
 
 Desde la carpeta backend/:
 
-\`\`\`bash
+~~~bash
 npm install
-\`\`\`
+~~~
 
 ### 5. Preparar la base de datos
 
@@ -168,9 +168,9 @@ Hay dos escenarios posibles. Elegí **uno**, según el estado de la base de dato
 
 Para crear la base de datos y preparar su estructura inicial, ejecutá desde backend/:
 
-\`\`\`bash
+~~~bash
 node utils/dbutils/db_setup.js
-\`\`\`
+~~~
 
 El usuario de base de datos configurado debe contar con los permisos necesarios para crear la base y sus objetos.
 
@@ -192,15 +192,15 @@ Los scripts están preparados para una base llamada bibliotech y cada uno indica
 
 Desde la carpeta backend/:
 
-\`\`\`bash
+~~~bash
 npm start
-\`\`\`
+~~~
 
 El servidor estará disponible en:
 
-\`\`\`text
+~~~text
 http://localhost:3000
-\`\`\`
+~~~
 
 ---
 
@@ -208,9 +208,9 @@ http://localhost:3000
 
 Abrí el navegador e ingresá a:
 
-\`\`\`text
+~~~text
 http://localhost:3000
-\`\`\`
+~~~
 
 Desde la interfaz se puede:
 
