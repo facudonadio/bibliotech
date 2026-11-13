@@ -41,7 +41,7 @@
              
              validator.validateThis(password)
                       .with(new Required("CT_REQ_PASSWORD"))
-                      .with(new MinLength(5, "CT_PASS_TOO_SHORT"));
+                      .with(new MinLength(6, "CT_PASS_TOO_SHORT"));
              
              next();
          } 
@@ -102,7 +102,7 @@
              validator.validateThis(category_id).with(new Required("CT_REQ_CATEGORY"));
              if (!Number.isInteger(Number(category_id)) || Number(category_id) <= 0)
              {
-                 throw new Error("La categoría seleccionada no es válida.");
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_CATEGORY_INVALID'));
              }
              validator.validateThis(pages).with(new PositiveNumber("CT_PAGES_POSITIVE"));
  
@@ -141,7 +141,7 @@
          {
              if (!Number.isInteger(bookId) || bookId <= 0)
              {
-                 throw new Error('El identificador del libro no es válido.');
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_ID_INVALID'));
              }
 
              validator.validateThis(title).with(new Required("CT_REQ_TITLE"));
@@ -151,19 +151,19 @@
 
              if (typeof title !== 'string' || typeof author !== 'string')
              {
-                 throw new Error('El título y el autor deben ser textos válidos.');
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_METADATA_TEXT'));
              }
              if (title.trim().length > 100 || author.trim().length > 100)
              {
-                 throw new Error('El título y el autor no pueden superar los 100 caracteres.');
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_METADATA_LENGTH'));
              }
              if (!Number.isInteger(Number(category_id)) || Number(category_id) <= 0)
              {
-                 throw new Error('La categoría seleccionada no es válida.');
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_CATEGORY_INVALID'));
              }
              if (!Number.isInteger(Number(pages)) || Number(pages) <= 0)
              {
-                 throw new Error('La cantidad de páginas debe ser un entero positivo.');
+                 throw new Error(validator.i18n.getMessage('CT_BOOK_PAGES_INTEGER'));
              }
 
              req.params.id = bookId;
