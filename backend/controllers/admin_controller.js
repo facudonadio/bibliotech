@@ -86,14 +86,28 @@
                  return res.status(404).json({ message });
              }
 
-             // Limpieza física: Eliminar almacenamiento en disco
-             userBooks.forEach(book => {fileHelper.deleteFile(book.file_path);});
+             // La transacción SQL ya fue confirmada; contar por separado la limpieza física.
+             let deletedFiles = 0;
+             let failedFiles = 0;
 
+             userBooks.forEach(book =>
+             {
+                 if (fileHelper.deleteFile(book.file_path))
+                 {
+                     deletedFiles++;
+                 }
+                 else
+                 {
+                     failedFiles++;
+                 }
+             });
 
- 
-             // Reemplazo dinámico (%s) para mostrar la cantidad de archivos borrados
-             const message = i18n.getMessage('CT_ADMIN_USER_DELETED').replace('%s', userBooks.length);
-             res.json({ message });
+             // Informar cantidades reales, sin confundir libros encontrados con archivos eliminados.
+             const message = i18n.getMessage('CT_ADMIN_USER_DELETED')
+                 .replace('%s', deletedFiles)
+                 .replace('%s', failedFiles);
+
+             res.json({ message, deletedFiles, failedFiles });
          } 
          catch (error) 
          {
