@@ -56,7 +56,8 @@
      /**
       * @brief Elimina permanentemente una cuenta de usuario del sistema.
       * @param {number} id - Identificador de la cuenta a eliminar.
-      * @returns {Promise<boolean>} Confirmación de éxito.
+      * @param {Object} executor Pool o conexión transaccional para ejecutar el SP.
+      * @returns {Promise<boolean>} True únicamente si se eliminó una cuenta.
       * 
       * @note La integridad referencial en la base de datos (ON DELETE CASCADE) 
       * se encargará automáticamente de borrar los registros de la tabla intermedia 
