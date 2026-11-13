@@ -233,7 +233,7 @@ El proyecto incluye un entorno integrado para validar los endpoints y filtros de
 2. Reinicia el servidor (`npm start`).
 3. Accede a `http://localhost:3000`. Verás la consola interactiva con botones para ejecutar tests automatizados de:
    - Login correcto e incorrecto.
-   - Control de contraseñas cortas (< 5 caracteres) con respuesta HTTP 400.
+   - Control de contraseñas cortas (< 6 caracteres) con respuesta HTTP 400.
    - Prevención de usuarios duplicados con respuesta HTTP 409 (`ER_DUP_ENTRY`).
    - Carga y listado de documentos PDF con autenticación Bearer.
    - Listado administrativo de cuentas.
