@@ -170,9 +170,9 @@ let adminBookCategories = [];
  
      try 
      {
-         await apiService.request(`/admin/users/${id}`, 'DELETE');
-         showModal('Éxito', 'Usuario y archivos eliminados con éxito');
-         loadUsers(); 
+         const result = await apiService.request(`/admin/users/${id}`, 'DELETE');
+         showModal('Resultado de eliminación', result.message);
+         await loadUsers(); 
      } 
      catch (error) 
      {
