@@ -26,5 +26,11 @@
     "CT_AUTH_LOGIN_SUCCESS": "Login successful.",
     "CT_BOOK_UPLOAD_SUCCESS": "PDF document successfully uploaded to the library.",
     "CT_BOOK_NOT_FOUND": "The document does not exist or you do not have permission to delete it.",
-    "CT_BOOK_DELETED_SUCCESS": "Record deleted and physical file successfully removed."
+    "CT_BOOK_DELETED_SUCCESS": "Record deleted and physical file successfully removed.",
+    "CT_BOOK_ID_INVALID": "The book identifier is invalid.",
+    "CT_BOOK_CATEGORY_INVALID": "The selected category is invalid.",
+    "CT_BOOK_METADATA_TEXT": "The title and author must be valid text values.",
+    "CT_BOOK_METADATA_LENGTH": "The title and author cannot exceed 100 characters.",
+    "CT_BOOK_PAGES_INTEGER": "The page count must be a positive integer.",
+    "CT_BOOK_METADATA_UPDATED": "Metadata updated successfully."
 }
