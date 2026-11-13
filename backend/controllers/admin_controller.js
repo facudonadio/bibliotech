@@ -53,7 +53,7 @@
              const adminId = req.userId; 
  
              // Regla de Negocio Semántica: Evitar auto-eliminación
-             if (targetUserId == adminId) 
+             if (Number(targetUserId) === Number(adminId)) 
              {
                  const message = i18n.getMessage('CT_ADMIN_CANT_DELETE_SELF');
                  return res.status(403).json({ message });
