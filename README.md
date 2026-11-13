@@ -30,6 +30,15 @@ Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
 
 ---
 
+## ⧉ Funcionalidades principales
+
+- **Gestión de libros PDF**: permite cargar, consultar, descargar y eliminar documentos.
+- **Edición de metadatos**: permite actualizar título, autor, categoría y cantidad de páginas sin modificar el archivo PDF. Los clientes solo pueden editar sus propios libros; los administradores pueden editar los libros de los clientes. Endpoint: `PUT /api/books/:id`.
+- **Categorías dinámicas**: las categorías se almacenan en la tabla `categories` y se consultan desde la API mediante `GET /api/categories`; los formularios cargan sus opciones desde el backend.
+- **Auditoría**: registra las acciones de eliminación de libros (`DELETE_BOOK`) y usuarios (`DELETE_USER`) en `audit_logs`, incluyendo actor, recurso afectado, IP disponible y fecha.
+
+---
+
 ## ⧉ Tecnologías Utilizadas
 
 ### Backend
@@ -53,6 +62,10 @@ Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
 bibliotech/
 ├── backend/
 │   ├── config/
+│   │   ├── migrations/
+│   │   │   ├── 001_categories.sql       # Normalización de categorías
+│   │   │   ├── 002_book_metadata.sql    # Procedimientos para edición de metadatos
+│   │   │   └── 003_audit_logs.sql       # Tabla y procedimiento de auditoría
 │   │   ├── db.js                        # Pool de conexiones a MySQL
 │   │   ├── init.sql                     # Script DDL: tablas, usuario y Stored Procedures
 │   │   ├── delete.sql                   # Script de limpieza idempotente
@@ -60,23 +73,27 @@ bibliotech/
 │   ├── controllers/
 │   │   ├── admin_controller.js          # Lógica semántica de administración
 │   │   ├── auth_controller.js           # Registro e inicio de sesión
-│   │   └── book_controller.js           # Carga, consulta y borrado de documentos
+│   │   ├── book_controller.js           # Carga, consulta, edición y borrado de documentos
+│   │   └── category_controller.js       # Consulta del catálogo de categorías
 │   ├── middleware/
 │   │   ├── auth_middleware.js           # Verificación de JWT y roles
 │   │   ├── global_error_middleware.js   # Red de contención y traducción de contingencias
 │   │   └── validation_middleware.js     # Escudo de validación sintáctica (Validator)
 │   ├── repositories/
+│   │   ├── audit_repository.js          # Persistencia de eventos de auditoría
 │   │   ├── book_repository.js           # Acceso a datos de libros (Capa Data Access)
+│   │   ├── category_repository.js       # Acceso al catálogo de categorías
 │   │   └── user_repository.js           # Acceso a identidades
 │   ├── routes/
 │   │   ├── admin_routes.js              # Endpoints protegidos para admins
 │   │   ├── auth_routes.js               # Endpoints públicos de identidad
 │   │   ├── book_routes.js               # Endpoints de la biblioteca privada
+│   │   ├── category_routes.js           # Endpoint del catálogo de categorías
 │   │   ├── tests_routes.js              # Ruta condicional para suite de pruebas
 │   │   └── view_routes.js               # Enrutador de pantallas HTML
 │   ├── uploads/                         # Directorio físico de almacenamiento PDF
 │   ├── utils/
-│   │   ├── db_utils/
+│   │   ├── dbutils/
 │   │   │   ├── db_check.js              # Script CLI de diagnóstico de conexión
 │   │   │   └── db_setup.js              # Inicialización automatizada (Bootstrap DB)
 │   │   ├── file_helper/
@@ -106,6 +123,7 @@ bibliotech/
 │   ├── img/                             # Favicon e iconografía
 │   └── js/
 │       ├── components/
+│       │   ├── book_editor.js            # Formulario dinámico de edición de metadatos
 │       │   └── ui_handlers.js           # Constructores de modales dinámicos (Zero-innerHTML)
 │       ├── front_controllers/
 │       │   ├── admin_front_controller.js
@@ -129,12 +147,13 @@ bibliotech/
 ## ⚙️ Instalación y Puesta en Marcha
 
 ### 1. Prerrequisitos
-- **Node.js** (v18 o superior recomendado)
-- **MySQL** o **MariaDB** (por ejemplo mediante XAMPP, Laragon o servicio local)
-- **Todo lo anterior se puede reemplazar 
+- **Node.js** (versión 18 o superior recomendada) y npm.
+- **MySQL** o **MariaDB** en ejecución. Puede utilizarse una instalación local, XAMPP o Laragon.
+- Un usuario administrador de MySQL/MariaDB para crear la base de datos y el usuario de aplicación durante la instalación inicial.
+
 
 ### 2. Configurar Variables de Entorno
-En la carpeta `backend/` existe un archivo `.env` (puedes tomar de base `.env.example`):
+Crea un archivo llamado `.env` dentro de `backend/`. Este archivo es local y no debe subirse al repositorio (está excluido mediante `.gitignore`).
 
 ```env
 PORT=3000
@@ -142,8 +161,8 @@ DB_HOST=localhost
 DB_USER=bibliotech
 DB_PASS=bibliotech
 DB_NAME=bibliotech
-JWT_SECRET=tu_clave_secreta_super_segura
-NODE_ENV=production
+JWT_SECRET=reemplazar_por_una_clave_larga_y_aleatoria
+NODE_ENV=development
 ```
 
 ### 3. Instalar Dependencias
@@ -155,13 +174,24 @@ npm install
 ```
 
 ### 4. Inicializar la Base de Datos
-Para crear automáticamente la base de datos `bibliotech`, el usuario con permisos de menor privilegio, las tablas y los Stored Procedures, ejecuta:
+
+**Instalación nueva:** utiliza esta opción solamente cuando todavía no exista el esquema de Bibliotech. Desde la carpeta `backend/`, ejecuta:
 
 ```bash
 node utils/dbutils/db_setup.js
 ```
 
-*(Opcional: Si cuentas con una contraseña para el usuario root de MySQL, puedes importar manualmente el archivo `backend/config/init.sql` desde **phpMyAdmin**, **MySQL Workbench** o la consola de MySQL).*
+El script ejecuta `config/init.sql`, que crea la base `bibliotech`, el usuario de aplicación, las tablas, los procedimientos almacenados y los datos iniciales. La configuración actual del script supone que el usuario `root` de MySQL está disponible en `localhost` sin contraseña. Si tu instalación de MySQL requiere contraseña para `root`, importa `backend/config/init.sql` mediante phpMyAdmin, MySQL Workbench o un cliente SQL con permisos administrativos.
+
+**Importante:** `init.sql` es un script de inicialización, no una migración incremental. No lo vuelvas a ejecutar sobre una base que ya contiene las tablas, porque varias instrucciones crean objetos sin `IF NOT EXISTS`.
+
+**Base de datos existente de una versión anterior:** realiza primero un respaldo y aplica, una sola vez y en este orden, los archivos de `config/migrations/`:
+
+1. `001_categories.sql`
+2. `002_book_metadata.sql`
+3. `003_audit_logs.sql`
+
+Estas migraciones están destinadas a actualizar una base existente que todavía no contiene esos cambios. No las ejecutes sobre una base recién creada con el `init.sql` actual, porque ese archivo ya incluye las tres funcionalidades.
 
 ### 5. Iniciar la Aplicación
 
@@ -186,6 +216,8 @@ Abre tu navegador e ingresa a `http://localhost:3000`.
 | **Administrador** | `admin` | `12345` | Vista de todos los clientes y borrado recursivo (DB + archivos en disco). |
 
 *(También es posible crear nuevos usuarios desde el enlace **Regístrate** en la pantalla de inicio).*
+
+> **Nota de seguridad:** las credenciales de ejemplo son únicamente para desarrollo y pruebas locales. Cambia las contraseñas y configura un `JWT_SECRET` propio antes de utilizar el sistema fuera de un entorno local.
 
 ---
 
