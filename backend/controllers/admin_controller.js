@@ -62,29 +62,28 @@
              // Obtener todos los libros cargados por el usuario objetivo antes de borrarlo
              const userBooks = await bookRepository.findByUserId(targetUserId);
              
-             // Eliminar de la base de datos (se produce cascada a nivel de tabla 'books')
-             const success = await userRepository.delete(targetUserId);
- 
-             if (!success) 
+             // El borrado y su evento de auditoría se confirman en una única transacción.
+             const success = await auditRepository.withTransaction(async connection =>
+             {
+                 const deleted = await userRepository.delete(targetUserId, connection);
+
+                 if (deleted)
+                 {
+                     await auditRepository.create({
+                         user_id: adminId,
+                         action: 'DELETE_USER',
+                         target: String(targetUserId),
+                         ip_address: req.ip || null
+                     }, connection);
+                 }
+
+                 return deleted;
+             });
+
+             if (!success)
              {
                  const message = i18n.getMessage('CT_ADMIN_USER_NOT_FOUND');
                  return res.status(404).json({ message });
-             }
- 
-             // Esperar el intento de auditoría antes de limpiar los archivos físicos.
-             // Una falla de auditoría se registra, pero no revierte la eliminación de la cuenta.
-             try
-             {
-                 await auditRepository.create({
-                     user_id: adminId,
-                     action: 'DELETE_USER',
-                     target: String(targetUserId),
-                     ip_address: req.ip || null
-                 });
-             }
-             catch (error)
-             {
-                 console.error('[Audit] No se pudo registrar DELETE_USER:', error);
              }
 
              // Limpieza física: Eliminar almacenamiento en disco
