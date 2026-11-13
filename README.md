@@ -26,7 +26,7 @@ Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
 4. **Filtro de Errores Global**:
    - `global_error_middleware.js`: Red de contención final que atrapa excepciones del sistema, fallos de Multer o errores de MySQL (`ER_DUP_ENTRY`, `ECONNREFUSED`), traduciéndolos a un formato JSON estandarizado sin exponer el *stack trace* en producción.
 5. **Frontend Seguro (Zero-XSS)**:
-   - Renderización dinámica de tablas y modales utilizando estrictamente métodos nativos del DOM (`createElement`, `textContent`, `replaceChildren`), erradicando por completo el uso de la propiedad insegura `innerHTML`.
+   - Renderización dinámica de tablas y modales utilizando estrictamente métodos nativos del DOM (`createElement`, `textContent`, `replaceChildren`), evitando el uso de la propiedad insegura `innerHTML` en la construcción dinámica de las interfaces implementadas.
 
 ---
 
@@ -106,8 +106,7 @@ bibliotech/
 │   │       ├── rules/                   # Estrategias OCP (min_length, required, etc.)
 │   │       ├── validator.js             # Motor Fluent Interface
 │   │       └── README.md                # Documentación del módulo
-│   ├── .env                             # Variables de entorno locales
-│   ├── .env.example                     # Plantilla de variables de entorno
+│   ├── package-lock.json                # Versiones bloqueadas de dependencias
 │   ├── package.json                     # Dependencias y scripts de Node
 │   └── server.js                        # Punto de entrada y definición del Pipeline
 ├── frontend/
