@@ -147,9 +147,9 @@ async function loadCategories()
      
      try 
      {
-         await apiService.request(`/books/${id}`, 'DELETE');
-         showModal('Eliminado', 'El documento ha sido borrado.');
-         loadBooks();
+         const result = await apiService.request(`/books/${id}`, 'DELETE');
+         showModal('Resultado de eliminación', result.message);
+         await loadBooks();
      } 
      catch (error) 
      {
