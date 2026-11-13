@@ -1,49 +1,59 @@
 # ⧉ Bibliotech
 
-**Bibliotech** es una plataforma web para la gestión documental de libros y archivos en formato PDF (.pdf). Diseñada bajo una arquitectura en **N capas**, aplicando el **patrón Repository**, uso estricto de **Stored Procedures** en base de datos y un frontend seguro con manipulación nativa del DOM (**Zero innerHTML**).
+**Bibliotech** es una plataforma web para la gestión documental de libros y archivos en formato PDF (.pdf). Está desarrollada con una arquitectura en **N capas**, el **patrón Repository**, procedimientos almacenados (*Stored Procedures*) para las operaciones de base de datos y manipulación nativa del DOM en el frontend.
 
-Este proyecto surge de la evolución y transformación del sistema *Sample Vault*, adaptando la gestión multimedia hacia un repositorio documental de lectura y descarga digital con un alto enfoque en estándares profesionales de Ingeniería de Software.
+El proyecto surge de la evolución y transformación del sistema *Sample Vault*, adaptando la gestión multimedia hacia un repositorio documental de lectura y descarga digital.
 
 Proyecto Sample Vault Original: https://github.com/gabrielinuz/sample-vault  
 Revisión V1.0 Sergio Puchatt: https://github.com/Sdpuchatt  
-Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech  
+Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
+
+---
+
+## ⧉ Funcionalidades principales
+
+- **Gestión de libros PDF:** carga, consulta, visualización, descarga y eliminación de documentos.
+- **Edición de metadatos:** permite actualizar los datos descriptivos de los libros respetando los permisos del usuario y conservando la referencia al archivo PDF.
+- **Categorías dinámicas:** las categorías se almacenan en la base de datos y se obtienen desde la API para completar los selectores del frontend.
+- **Auditoría:** registra eventos de eliminación de libros y usuarios, incluyendo el usuario que realizó la acción, el elemento afectado, la dirección IP disponible y la fecha.
+- **Administración de usuarios:** permite consultar y administrar las cuentas según los roles definidos.
 
 ---
 
 ## ⧉ Hitos de Ingeniería y Arquitectura
 
-1. **Arquitectura en N Capas (Separación Estricta de Responsabilidades)**:
-   - **Base de Datos**: Stored Procedures para transacciones encapsuladas y aplicación del Principio de Menor Privilegio (PoLP).
-   - **Repositorios (`Repository Pattern`)**: Abstracción total del acceso a datos.
-   - **Controladores**: Gestión exclusiva de la lógica de negocio semántica.
-   - **Middlewares**: Escudos preventivos para validación sintáctica y autorización.
-   - **Rutas (`Router`)**: Enrutamiento declarativo y modular para la API.
-2. **Motor de Validación Custom y Patrones de Diseño**:
-   - Implementación de la clase `Validator` utilizando **Fluent Interface**, **Strategy** (Principio Abierto/Cerrado para reglas) y **Visitor**.
-   - `validation_middleware.js`: Aplica las reglas del validador deteniendo peticiones malformadas antes de que alcancen los controladores (Principio *Fail-Fast*).
-3. **Internacionalización y Localización (i18n)**:
-   - Implementación del patrón **Singleton** para cargar diccionarios estáticos en memoria, centralizando y traduciendo todos los mensajes del sistema y excepciones sin *hardcodear* strings en la lógica.
-4. **Filtro de Errores Global**:
-   - `global_error_middleware.js`: Red de contención final que atrapa excepciones del sistema, fallos de Multer o errores de MySQL (`ER_DUP_ENTRY`, `ECONNREFUSED`), traduciéndolos a un formato JSON estandarizado sin exponer el *stack trace* en producción.
-5. **Frontend Seguro (Zero-XSS)**:
-   - Renderización dinámica de tablas y modales utilizando estrictamente métodos nativos del DOM (`createElement`, `textContent`, `replaceChildren`), erradicando por completo el uso de la propiedad insegura `innerHTML`.
+1. **Arquitectura en N Capas (separación de responsabilidades):**
+   - **Base de Datos:** tablas y procedimientos almacenados para las operaciones de persistencia.
+   - **Repositorios (Repository Pattern):** abstracción del acceso a los datos.
+   - **Controladores:** coordinación de la lógica de las solicitudes.
+   - **Middlewares:** validación de datos, autenticación y autorización.
+   - **Rutas (Router):** definición modular de los endpoints de la API.
+2. **Motor de Validación y Patrones de Diseño:**
+   - Implementación de la clase `Validator` utilizando Fluent Interface y reglas extensibles.
+   - `validation_middleware.js`: aplica las reglas de validación antes de que las solicitudes lleguen a los controladores.
+3. **Internacionalización y Localización (i18n):**
+   - Diccionarios de traducción centralizados para los mensajes del sistema.
+4. **Manejo Global de Errores:**
+   - `global_error_middleware.js`: centraliza el tratamiento de errores y evita exponer detalles internos sensibles en las respuestas de producción.
+5. **Frontend:**
+   - Construcción de elementos dinámicos mediante métodos nativos del DOM, como `createElement`, `textContent` y `replaceChildren`, evitando insertar contenido dinámico mediante `innerHTML`.
 
 ---
 
 ## ⧉ Tecnologías Utilizadas
 
 ### Backend
-- **Node.js & Express**: Servidor HTTP modular y enrutamiento REST.
-- **MySQL / MariaDB (`mysql2`)**: Base de datos relacional y ejecución de Prepared Statements.
-- **Multer**: Procesamiento seguro de cargas `multipart/form-data` para archivos PDF.
-- **JSON Web Tokens (JWT)**: Autenticación *stateless* basada en tokens Bearer.
-- **Bcrypt**: Hashing seguro de contraseñas con factor de costo.
-- **Dotenv**: Gestión de variables de entorno para protección de secretos.
+- **Node.js & Express:** servidor HTTP y API REST.
+- **MySQL / MariaDB (`mysql2`):** base de datos relacional.
+- **Multer:** procesamiento de cargas `multipart/form-data` para archivos PDF.
+- **JSON Web Tokens (JWT):** autenticación mediante tokens.
+- **Bcrypt:** hash de contraseñas.
+- **Dotenv:** lectura de variables de entorno.
 
 ### Frontend
-- **Vanilla JavaScript**: Lógica frontend asíncrona (Fetch API) sin frameworks pesados.
-- **W3.CSS**: Framework CSS ligero para diseño responsive y componentes UI.
-- **CSS Custom Properties**: Paleta de colores unificada (Single Source of Truth).
+- **Vanilla JavaScript:** lógica frontend asíncrona mediante Fetch API.
+- **W3.CSS:** estilos y componentes de interfaz.
+- **CSS Custom Properties:** variables CSS para mantener una paleta visual unificada.
 
 ---
 
@@ -53,73 +63,76 @@ Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
 bibliotech/
 ├── backend/
 │   ├── config/
-│   │   ├── db.js                        # Pool de conexiones a MySQL
-│   │   ├── init.sql                     # Script DDL: tablas, usuario y Stored Procedures
-│   │   ├── delete.sql                   # Script de limpieza idempotente
-│   │   └── multer_config.js             # Configuración y filtro estricto de PDFs
+│   │   ├── migrations/
+│   │   │   ├── 001_categories.sql          # Categorías dinámicas
+│   │   │   ├── 002_book_metadata.sql       # Edición de metadatos
+│   │   │   └── 003_audit_logs.sql          # Auditoría
+│   │   ├── db.js                           # Pool de conexiones a MySQL
+│   │   ├── init.sql                        # Estructura inicial y Stored Procedures
+│   │   ├── delete.sql                      # Script de limpieza
+│   │   └── multer_config.js                # Configuración de carga de PDFs
 │   ├── controllers/
-│   │   ├── admin_controller.js          # Lógica semántica de administración
-│   │   ├── auth_controller.js           # Registro e inicio de sesión
-│   │   └── book_controller.js           # Carga, consulta y borrado de documentos
+│   │   ├── admin_controller.js             # Operaciones administrativas
+│   │   ├── auth_controller.js              # Registro e inicio de sesión
+│   │   ├── book_controller.js              # Gestión de libros
+│   │   └── category_controller.js          # Consulta de categorías
 │   ├── middleware/
-│   │   ├── auth_middleware.js           # Verificación de JWT y roles
-│   │   ├── global_error_middleware.js   # Red de contención y traducción de contingencias
-│   │   └── validation_middleware.js     # Escudo de validación sintáctica (Validator)
+│   │   ├── auth_middleware.js              # Verificación de JWT y roles
+│   │   ├── global_error_middleware.js      # Manejo global de errores
+│   │   └── validation_middleware.js        # Validación de solicitudes
 │   ├── repositories/
-│   │   ├── book_repository.js           # Acceso a datos de libros (Capa Data Access)
-│   │   └── user_repository.js           # Acceso a identidades
+│   │   ├── audit_repository.js             # Persistencia de eventos de auditoría
+│   │   ├── book_repository.js              # Acceso a datos de libros
+│   │   ├── category_repository.js          # Acceso a datos de categorías
+│   │   └── user_repository.js              # Acceso a datos de usuarios
 │   ├── routes/
-│   │   ├── admin_routes.js              # Endpoints protegidos para admins
-│   │   ├── auth_routes.js               # Endpoints públicos de identidad
-│   │   ├── book_routes.js               # Endpoints de la biblioteca privada
-│   │   ├── tests_routes.js              # Ruta condicional para suite de pruebas
-│   │   └── view_routes.js               # Enrutador de pantallas HTML
-│   ├── uploads/                         # Directorio físico de almacenamiento PDF
+│   │   ├── admin_routes.js                 # Endpoints administrativos
+│   │   ├── auth_routes.js                  # Endpoints de autenticación
+│   │   ├── book_routes.js                  # Endpoints de libros
+│   │   ├── category_routes.js              # Endpoints de categorías
+│   │   ├── tests_routes.js                 # Rutas de pruebas
+│   │   └── view_routes.js                  # Rutas de vistas HTML
+│   ├── uploads/                            # Almacenamiento de archivos PDF
 │   ├── utils/
-│   │   ├── db_utils/
-│   │   │   ├── db_check.js              # Script CLI de diagnóstico de conexión
-│   │   │   └── db_setup.js              # Inicialización automatizada (Bootstrap DB)
+│   │   ├── dbutils/
+│   │   │   ├── db_check.js                 # Diagnóstico de conexión
+│   │   │   └── db_setup.js                 # Inicialización de la base de datos
 │   │   ├── file_helper/
-│   │   │   └── file_helper.js           # Limpieza síncrona de archivos huérfanos
+│   │   │   └── file_helper.js              # Gestión de archivos
 │   │   ├── i18n/
-│   │   │   ├── locales/                 # Diccionarios JSON (es.json, en.json)
-│   │   │   ├── i18n.js                  # Motor Singleton de traducciones
-│   │   │   └── README.md                # Documentación del módulo
+│   │   │   ├── locales/                    # Diccionarios de traducción
+│   │   │   ├── i18n.js                     # Motor de traducciones
+│   │   │   └── README.md                   # Documentación del módulo
 │   │   └── validator/
-│   │       ├── rules/                   # Estrategias OCP (min_length, required, etc.)
-│   │       ├── validator.js             # Motor Fluent Interface
-│   │       └── README.md                # Documentación del módulo
-│   ├── .env                             # Variables de entorno locales
-│   ├── .env.example                     # Plantilla de variables de entorno
-│   ├── package.json                     # Dependencias y scripts de Node
-│   └── server.js                        # Punto de entrada y definición del Pipeline
+│   │       ├── rules/                      # Reglas de validación
+│   │       ├── validator.js                # Motor de validación
+│   │       └── README.md                   # Documentación del módulo
+│   ├── .env.example                        # Plantilla de variables de entorno
+│   ├── package.json                        # Dependencias y scripts
+│   └── server.js                            # Punto de entrada del servidor
 ├── frontend/
 │   ├── css/
-│   │   ├── style.css                    # Estilos personalizados (Variables CSS)
-│   │   └── w3.css                       # Framework estructural
+│   │   ├── style.css                       # Estilos personalizados
+│   │   └── w3.css                          # Framework CSS
 │   ├── html/
-│   │   ├── admin_dashboard.html         # Panel de auditoría de usuarios
-│   │   ├── client_dashboard.html        # Interfaz de lectura y gestión PDF
-│   │   ├── login.html                   # Pantalla de inicio de sesión
-│   │   ├── register.html                # Pantalla de creación de cuenta
-│   │   └── tests.html                   # Interfaz del laboratorio de pruebas DOM
-│   ├── img/                             # Favicon e iconografía
+│   │   ├── admin_dashboard.html            # Panel administrativo
+│   │   ├── client_dashboard.html            # Panel del cliente
+│   │   ├── login.html                      # Inicio de sesión
+│   │   ├── register.html                   # Registro
+│   │   └── tests.html                      # Interfaz de pruebas
 │   └── js/
 │       ├── components/
-│       │   └── ui_handlers.js           # Constructores de modales dinámicos (Zero-innerHTML)
+│       │   ├── book_editor.js              # Edición de metadatos
+│       │   └── ui_handlers.js              # Componentes dinámicos de interfaz
 │       ├── front_controllers/
 │       │   ├── admin_front_controller.js
 │       │   ├── auth_front_controller.js
 │       │   └── books_front_controller.js
 │       ├── services/
-│       │   └── api_service.js           # Cliente Fetch interceptor (Inyección JWT)
-│       ├── tests/
-│       │   ├── admin_tests.js           # Tests unitarios de rol administrador
-│       │   ├── auth_tests.js            # Tests de escudos de identidad (400, 401, 409)
-│       │   ├── book_tests.js            # Simulación Blob de subida documental
-│       │   └── test_utils.js            # Framework de testing DOM
+│       │   └── api_service.js              # Cliente HTTP e inyección de JWT
+│       ├── tests/                          # Pruebas del frontend
 │       └── utils/
-│           └── auth_helper.js           # Gestión del ciclo de vida en localStorage
+│           └── auth_helper.js              # Gestión de autenticación en frontend
 ├── .gitignore
 └── README.md
 ```
@@ -129,78 +142,95 @@ bibliotech/
 ## ⚙️ Instalación y Puesta en Marcha
 
 ### 1. Prerrequisitos
-- **Node.js** (v18 o superior recomendado)
-- **MySQL** o **MariaDB** (por ejemplo mediante XAMPP, Laragon o servicio local)
-- **Todo lo anterior se puede reemplazar 
 
-### 2. Configurar Variables de Entorno
-En la carpeta `backend/` existe un archivo `.env` (puedes tomar de base `.env.example`):
+- **Node.js** (v18 o superior recomendado).
+- **MySQL** o **MariaDB**.
+- Un gestor de base de datos o acceso a la consola para inicializarla.
+
+### 2. Configurar las variables de entorno
+
+En la carpeta `backend/`, crea un archivo llamado `.env` tomando como referencia `.env.example`.
+
+Configura los valores correspondientes a tu entorno:
 
 ```env
 PORT=3000
 DB_HOST=localhost
-DB_USER=bibliotech
-DB_PASS=bibliotech
+DB_USER=usuario_de_base_de_datos
+DB_PASS=contraseña_de_base_de_datos
 DB_NAME=bibliotech
-JWT_SECRET=tu_clave_secreta_super_segura
-NODE_ENV=production
+JWT_SECRET=una_clave_larga_y_aleatoria
+NODE_ENV=development
 ```
 
-### 3. Instalar Dependencias
-Desde la terminal, accede a la carpeta `backend`:
+No compartas ni subas el archivo `.env` al repositorio. Utiliza valores propios de tu entorno y mantené las credenciales fuera del control de versiones.
+
+### 3. Instalar dependencias
+
+Desde una terminal, ingresa a la carpeta del backend:
 
 ```bash
 cd backend
 npm install
 ```
 
-### 4. Inicializar la Base de Datos
-Para crear automáticamente la base de datos `bibliotech`, el usuario con permisos de menor privilegio, las tablas y los Stored Procedures, ejecuta:
+### 4. Inicializar o actualizar la base de datos
+
+**Instalación nueva:** ejecuta el script de inicialización siguiendo la configuración de tu entorno:
 
 ```bash
 node utils/dbutils/db_setup.js
 ```
 
-*(Opcional: Si cuentas con una contraseña para el usuario root de MySQL, puedes importar manualmente el archivo `backend/config/init.sql` desde **phpMyAdmin**, **MySQL Workbench** o la consola de MySQL).*
+El script prepara la base de datos y sus objetos según la configuración del proyecto. También se puede utilizar `config/init.sql` desde una herramienta de administración de MySQL/MariaDB, con los permisos necesarios.
 
-### 5. Iniciar la Aplicación
+**Base de datos existente:** si la base ya contiene la estructura anterior del proyecto, revisa primero qué cambios tiene aplicados y realiza una copia de seguridad. Luego aplica, en orden y una sola vez, las migraciones:
+
+1. `config/migrations/001_categories.sql`
+2. `config/migrations/002_book_metadata.sql`
+3. `config/migrations/003_audit_logs.sql`
+
+Las migraciones deben ejecutarse sobre la base de datos correspondiente y con un usuario que tenga los permisos necesarios. No ejecutes las migraciones sobre una base que ya tenga esos cambios aplicados.
+
+### 5. Iniciar la aplicación
+
+Desde la carpeta `backend/`:
 
 ```bash
 npm start
 ```
 
-El servidor estará listo y escuchando en:
-👉 **`http://localhost:3000`**
+El servidor estará disponible, según la configuración, en:
+
+`http://localhost:3000`
 
 ---
 
 ## ⧉ Guía de Uso
 
-Abre tu navegador e ingresa a `http://localhost:3000`.
+Abre el navegador e ingresa a `http://localhost:3000`.
 
-### Usuarios de Prueba Preconfigurados:
+Desde la interfaz se puede:
 
-| Rol | Usuario | Contraseña | Permisos y Funcionalidad |
-| :--- | :--- | :--- | :--- |
-| **Cliente** | `pepe` | `12345` | Carga de libros PDF, visualización en modal, descarga y borrado. |
-| **Administrador** | `admin` | `12345` | Vista de todos los clientes y borrado recursivo (DB + archivos en disco). |
+- Registrarse e iniciar sesión.
+- Cargar y consultar libros PDF.
+- Visualizar y descargar documentos.
+- Editar los metadatos de los libros según los permisos del usuario.
+- Consultar las categorías disponibles.
+- Realizar operaciones administrativas según el rol asignado.
 
-*(También es posible crear nuevos usuarios desde el enlace **Regístrate** en la pantalla de inicio).*
+Los usuarios y contraseñas de prueba, si están habilitados en la instalación, deben configurarse de acuerdo con el entorno local. Cambia las credenciales predeterminadas antes de utilizar el sistema fuera de un entorno de prueba.
 
 ---
 
 ## ⧉ Laboratorio de Pruebas API
 
-El proyecto incluye un entorno integrado para validar los endpoints y filtros de error:
+El proyecto incluye un entorno de pruebas para validar endpoints y comportamientos de la API.
 
-1. En el archivo `backend/.env`, cambia la variable `NODE_ENV`:
-   ```env
-   NODE_ENV=testing
-   ```
-2. Reinicia el servidor (`npm start`).
-3. Accede a `http://localhost:3000`. Verás la consola interactiva con botones para ejecutar tests automatizados de:
-   - Login correcto e incorrecto.
-   - Control de contraseñas cortas (< 6 caracteres) con respuesta HTTP 400.
-   - Prevención de usuarios duplicados con respuesta HTTP 409 (`ER_DUP_ENTRY`).
-   - Carga y listado de documentos PDF con autenticación Bearer.
-   - Listado administrativo de cuentas.
+Si el entorno de pruebas está habilitado en la configuración:
+
+1. En `backend/.env`, configura `NODE_ENV=testing`.
+2. Reinicia el servidor.
+3. Accede a `http://localhost:3000` y utiliza la interfaz de pruebas.
+
+Las pruebas disponibles pueden incluir validaciones de autenticación, prevención de usuarios duplicados, carga y listado de documentos y operaciones administrativas. Ejecutalas sobre una base de datos de prueba, nunca sobre datos de producción.
