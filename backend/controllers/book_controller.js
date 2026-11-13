@@ -124,13 +124,13 @@
                  return res.status(404).json({ message });
              }
 
-             // Eliminar archivo físico en disco de forma síncrona
-             fileHelper.deleteFile(book.file_path);
+             // La transacción SQL ya fue confirmada; la limpieza física se informa por separado.
+             const fileDeleted = fileHelper.deleteFile(book.file_path);
+             const message = i18n.getMessage(
+                 fileDeleted ? 'CT_BOOK_DELETED_SUCCESS' : 'CT_BOOK_DELETED_FILE_WARNING'
+             );
 
- 
-             
-             const message = i18n.getMessage('CT_BOOK_DELETED_SUCCESS');
-             res.json({ message });
+             res.json({ message, fileDeleted });
          }
          catch (error)
          {
