@@ -20,11 +20,18 @@
     "CT_AUTH_ADMIN_REQUIRED": "Acceso denegado: Se requiere privilegios de administrador.",
     "CT_ADMIN_CANT_DELETE_SELF": "Operación denegada: No puedes eliminar tu propia cuenta de administrador.",
     "CT_ADMIN_USER_NOT_FOUND": "Usuario no encontrado.",
-    "CT_ADMIN_USER_DELETED": "Usuario eliminado con éxito. Se removieron %s archivos PDF.",
+    "CT_ADMIN_USER_DELETED": "Usuario eliminado de la base de datos. Se removieron %s archivos PDF y no se pudieron remover %s.",
+    "CT_BOOK_DELETED_FILE_WARNING": "Registro eliminado de la base de datos, pero no se pudo eliminar el archivo PDF.",
     "CT_AUTH_REGISTER_SUCCESS": "Usuario registrado con éxito.",
     "CT_AUTH_INVALID_CREDS": "Credenciales inválidas.",
     "CT_AUTH_LOGIN_SUCCESS": "Login exitoso.",
     "CT_BOOK_UPLOAD_SUCCESS": "Documento PDF cargado exitosamente en la biblioteca.",
     "CT_BOOK_NOT_FOUND": "El documento no existe o no tienes permisos para eliminarlo.",
-    "CT_BOOK_DELETED_SUCCESS": "Registro eliminado y archivo físico removido con éxito."
+    "CT_BOOK_DELETED_SUCCESS": "Registro eliminado y archivo físico removido con éxito.",
+    "CT_BOOK_ID_INVALID": "El identificador del libro no es válido.",
+    "CT_BOOK_CATEGORY_INVALID": "La categoría seleccionada no es válida.",
+    "CT_BOOK_METADATA_TEXT": "El título y el autor deben ser textos válidos.",
+    "CT_BOOK_METADATA_LENGTH": "El título y el autor no pueden superar los 100 caracteres.",
+    "CT_BOOK_PAGES_INTEGER": "La cantidad de páginas debe ser un entero positivo.",
+    "CT_BOOK_METADATA_UPDATED": "Metadatos actualizados correctamente."
 }

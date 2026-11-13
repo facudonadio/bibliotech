@@ -35,7 +35,7 @@ Revisión V2.0 GNGF: https://github.com/tecnobfi/bibliotech
 - **Gestión de libros PDF**: permite cargar, consultar, descargar y eliminar documentos.
 - **Edición de metadatos**: permite actualizar título, autor, categoría y cantidad de páginas sin modificar el archivo PDF. Los clientes solo pueden editar sus propios libros; los administradores pueden editar los libros de los clientes. Endpoint: `PUT /api/books/:id`.
 - **Categorías dinámicas**: las categorías se almacenan en la tabla `categories` y se consultan desde la API mediante `GET /api/categories`; los formularios cargan sus opciones desde el backend.
-- **Auditoría**: registra las acciones de eliminación de libros (`DELETE_BOOK`) y usuarios (`DELETE_USER`) en `audit_logs`, incluyendo actor, recurso afectado, IP disponible y fecha.
+- **Auditoría**: registra las acciones de eliminación de libros (`DELETE_BOOK`) y usuarios (`DELETE_USER`) en `audit_logs`, incluyendo actor, recurso afectado, IP disponible y fecha. El borrado y su evento de auditoría se confirman en una misma transacción para evitar eliminaciones sin trazabilidad.
 
 ---
 
@@ -65,7 +65,8 @@ bibliotech/
 │   │   ├── migrations/
 │   │   │   ├── 001_categories.sql       # Normalización de categorías
 │   │   │   ├── 002_book_metadata.sql    # Procedimientos para edición de metadatos
-│   │   │   └── 003_audit_logs.sql       # Tabla y procedimiento de auditoría
+│   │   │   ├── 003_audit_logs.sql       # Tabla y procedimiento de auditoría
+│   │   │   └── 004_delete_affected_rows.sql # Resultado real de los procedimientos de borrado
 │   │   ├── db.js                        # Pool de conexiones a MySQL
 │   │   ├── init.sql                     # Script DDL: tablas, usuario y Stored Procedures
 │   │   ├── delete.sql                   # Script de limpieza idempotente
@@ -189,8 +190,9 @@ El script ejecuta `config/init.sql`, que crea la base `bibliotech`, el usuario d
 1. `001_categories.sql`
 2. `002_book_metadata.sql`
 3. `003_audit_logs.sql`
+4. `004_delete_affected_rows.sql`
 
-Estas migraciones están destinadas a actualizar una base existente que todavía no contiene esos cambios. No las ejecutes sobre una base recién creada con el `init.sql` actual, porque ese archivo ya incluye las tres funcionalidades.
+Estas migraciones están destinadas a actualizar una base existente que todavía no contiene esos cambios. No las ejecutes sobre una base recién creada con el `init.sql` actual, porque ese archivo ya incluye las tres funcionalidades y los procedimientos de borrado actualizados.
 
 ### 5. Iniciar la Aplicación
 
