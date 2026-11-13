@@ -125,7 +125,11 @@
 
      /**
       * @brief Valida el ID y los metadatos enviados para editar un libro.
-      * @details Esta ruta recibe JSON y nunca procesa archivos PDF.
+      * @param {Object} req Petición HTTP con ID y metadatos en el cuerpo JSON.
+      * @param {Object} res Respuesta HTTP para errores de validación.
+      * @param {Function} next Continúa hacia el controlador si todos los campos son válidos.
+      * @details Esta ruta recibe JSON y nunca procesa archivos PDF; valida presencia,
+      *          tipos, longitudes y valores positivos antes de acceder al repositorio.
       */
      validateBookMetadata: (req, res, next) =>
      {
