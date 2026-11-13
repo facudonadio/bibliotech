@@ -163,7 +163,7 @@
                  return res.status(404).json({ message });
              }
 
-             res.json({ message: 'Metadatos actualizados correctamente.' });
+             res.json({ message: i18n.getMessage('CT_BOOK_METADATA_UPDATED') });
          }
          catch (error)
          {
