@@ -6,7 +6,7 @@
 
 /**
  * @class BookEditor
- * @brief Delegates la apertura del formulario al componente de interfaz compartido.
+ * @brief Delega la apertura del formulario al componente de interfaz compartido.
  */
 const bookEditor =
 {
