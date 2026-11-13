@@ -68,10 +68,15 @@
       * @param {number} userId - ID del usuario activo (propietario esperado).
       * @returns {Promise<boolean>} Retorna true si la ejecución del SP finalizó sin excepciones.
       */
-     async delete(id, userId) 
+     async delete(id, userId, executor = db)
      {
-         await db.execute('CALL sp_delete_book(?, ?)', [id, userId]);
-         return true;
+         const [rows] = await executor.execute(
+             'CALL sp_delete_book(?, ?)',
+             [id, userId]
+         );
+
+         // El SP devuelve ROW_COUNT() para distinguir un borrado real de un ID inexistente.
+         return Number(rows[0][0].affectedRows) > 0;
      }
  
      /**
