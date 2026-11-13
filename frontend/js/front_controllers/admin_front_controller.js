@@ -117,8 +117,7 @@ let adminBookCategories = [];
  {
      const tbody = document.getElementById('usersTableBody');
      
-     // replaceChildren() es el método moderno y más rápido para vaciar un contenedor DOM, 
-     // reemplazando el inseguro tbody.innerHTML = ''
+     // replaceChildren() vacía el contenedor sin interpretar cadenas como marcado HTML.
      tbody.replaceChildren();
  
      users.forEach(u => 
