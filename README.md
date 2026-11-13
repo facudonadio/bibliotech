@@ -65,7 +65,8 @@ bibliotech/
 │   │   ├── migrations/
 │   │   │   ├── 001_categories.sql       # Normalización de categorías
 │   │   │   ├── 002_book_metadata.sql    # Procedimientos para edición de metadatos
-│   │   │   └── 003_audit_logs.sql       # Tabla y procedimiento de auditoría
+│   │   │   ├── 003_audit_logs.sql       # Tabla y procedimiento de auditoría
+│   │   │   └── 004_delete_affected_rows.sql # Resultado real de los procedimientos de borrado
 │   │   ├── db.js                        # Pool de conexiones a MySQL
 │   │   ├── init.sql                     # Script DDL: tablas, usuario y Stored Procedures
 │   │   ├── delete.sql                   # Script de limpieza idempotente
@@ -191,7 +192,7 @@ El script ejecuta `config/init.sql`, que crea la base `bibliotech`, el usuario d
 3. `003_audit_logs.sql`
 4. `004_delete_affected_rows.sql`
 
-Estas migraciones están destinadas a actualizar una base existente que todavía no contiene esos cambios. No las ejecutes sobre una base recién creada con el `init.sql` actual, porque ese archivo ya incluye las tres funcionalidades.
+Estas migraciones están destinadas a actualizar una base existente que todavía no contiene esos cambios. No las ejecutes sobre una base recién creada con el `init.sql` actual, porque ese archivo ya incluye las tres funcionalidades y los procedimientos de borrado actualizados.
 
 ### 5. Iniciar la Aplicación
 
