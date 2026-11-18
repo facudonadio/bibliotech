@@ -96,6 +96,12 @@ bibliotech/
 │   │   ├── delete.sql
 │   │   ├── init.sql
 │   │   └── multer_config.js
+│   ├── doc/
+│   │   ├── Tutoria-Bibliotech.pdf
+│   │   ├── diagrama_de_base_de_datos.dia / .png
+│   │   ├── diagrama_de_clases-validation_handler.dia / .png
+│   │   ├── diagrama_de_clases-validation_handler_sin_interfaces.dia / .png
+│   │   └── diagrama_secuencia.png
 │   ├── controllers/
 │   │   ├── admin_controller.js
 │   │   ├── auth_controller.js
@@ -144,6 +150,8 @@ bibliotech/
 │   │   ├── login.html
 │   │   ├── register.html
 │   │   └── tests.html
+│   ├── img/
+│   │   └── favicon.png
 │   └── js/
 │       ├── components/
 │       │   ├── book_editor.js
