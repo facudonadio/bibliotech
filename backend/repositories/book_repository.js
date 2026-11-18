@@ -66,12 +66,20 @@
       * @brief Elimina un documento de la base de datos.
       * @param {number} id - ID del libro.
       * @param {number} userId - ID del usuario activo (propietario esperado).
-      * @returns {Promise<boolean>} Retorna true si la ejecución del SP finalizó sin excepciones.
+      * @param {Object} executor Pool o conexión transaccional para ejecutar el SP.
+      * @returns {Promise<boolean>} True únicamente si se eliminó un registro.
+      * @details Se admite una conexión externa para incluir el borrado y la auditoría
+      *          en la misma transacción.
       */
-     async delete(id, userId) 
+     async delete(id, userId, executor = db)
      {
-         await db.execute('CALL sp_delete_book(?, ?)', [id, userId]);
-         return true;
+         const [rows] = await executor.execute(
+             'CALL sp_delete_book(?, ?)',
+             [id, userId]
+         );
+
+         // El SP devuelve ROW_COUNT() para distinguir un borrado real de un ID inexistente.
+         return Number(rows[0][0].affectedRows) > 0;
      }
  
      /**

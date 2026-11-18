@@ -56,16 +56,19 @@
      /**
       * @brief Elimina permanentemente una cuenta de usuario del sistema.
       * @param {number} id - Identificador de la cuenta a eliminar.
-      * @returns {Promise<boolean>} Confirmación de éxito.
+      * @param {Object} executor Pool o conexión transaccional para ejecutar el SP.
+      * @returns {Promise<boolean>} True únicamente si se eliminó una cuenta.
       * 
       * @note La integridad referencial en la base de datos (ON DELETE CASCADE) 
       * se encargará automáticamente de borrar los registros de la tabla intermedia 
       * 'users_roles' y los metadatos de sus libros en la tabla 'books'.
       */
-     async delete(id) 
+     async delete(id, executor = db)
      {
-         await db.execute('CALL sp_delete_user(?)', [id]);
-         return true;
+         const [rows] = await executor.execute('CALL sp_delete_user(?)', [id]);
+
+         // El procedimiento devuelve ROW_COUNT() para no informar éxito ante un ID inexistente.
+         return Number(rows[0][0].affectedRows) > 0;
      }
  }
  

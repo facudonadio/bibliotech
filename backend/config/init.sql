@@ -180,10 +180,16 @@ BEGIN
     JOIN roles r ON ur.role_id = r.id;
 END //
 
--- Borrar usuario por ID
+/**
+ * @brief Elimina una cuenta y devuelve la cantidad real de filas afectadas.
+ * @param p_id Identificador de la cuenta que se desea eliminar.
+ * @details ROW_COUNT permite que el repositorio distinga un borrado real
+ *          de una petición dirigida a un usuario inexistente.
+ */
 CREATE PROCEDURE sp_delete_user(IN p_id INT)
 BEGIN
     DELETE FROM users WHERE id = p_id;
+    SELECT ROW_COUNT() AS affectedRows;
 END //
 
 -- --- PROCEDIMIENTOS PARA CATEGORIES ---
@@ -236,12 +242,16 @@ BEGIN
     WHERE b.id = p_id AND b.user_id = p_user_id;
 END //
 
-/*
- * @brief Borrar libro (Validando autoría)
+/**
+ * @brief Elimina un libro únicamente si pertenece al usuario indicado.
+ * @param p_id Identificador del documento.
+ * @param p_user_id Identificador del propietario autenticado.
+ * @details Devuelve ROW_COUNT para confirmar que la eliminación ocurrió.
  */
 CREATE PROCEDURE sp_delete_book(IN p_id INT, IN p_user_id INT)
 BEGIN
     DELETE FROM books WHERE id = p_id AND user_id = p_user_id;
+    SELECT ROW_COUNT() AS affectedRows;
 END //
 
  

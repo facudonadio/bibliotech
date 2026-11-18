@@ -99,32 +99,38 @@
                  return res.status(404).json({ message });
              }
  
-             // Eliminar registro en base de datos
-             await bookRepository.delete(id, userId);
- 
-             // Esperar el intento de auditoría antes de limpiar el archivo físico.
-             // Una falla de auditoría se registra, pero no revierte la eliminación del libro.
-             try
+             // El borrado y su evento de auditoría comparten una transacción.
+             // Si cualquiera de las dos operaciones falla, se revierten ambas.
+             const deleted = await auditRepository.withTransaction(async connection =>
              {
-                 await auditRepository.create({
-                     user_id: userId,
-                     action: 'DELETE_BOOK',
-                     target: String(id),
-                     ip_address: req.ip || null
-                 });
-             }
-             catch (error)
+                 const success = await bookRepository.delete(id, userId, connection);
+
+                 if (success)
+                 {
+                     await auditRepository.create({
+                         user_id: userId,
+                         action: 'DELETE_BOOK',
+                         target: String(id),
+                         ip_address: req.ip || null
+                     }, connection);
+                 }
+
+                 return success;
+             });
+
+             if (!deleted)
              {
-                 console.error('[Audit] No se pudo registrar DELETE_BOOK:', error);
+                 const message = i18n.getMessage('CT_BOOK_NOT_FOUND');
+                 return res.status(404).json({ message });
              }
 
-             // Eliminar archivo físico en disco de forma síncrona
-             fileHelper.deleteFile(book.file_path);
+             // La transacción SQL ya fue confirmada; la limpieza física se informa por separado.
+             const fileDeleted = fileHelper.deleteFile(book.file_path);
+             const message = i18n.getMessage(
+                 fileDeleted ? 'CT_BOOK_DELETED_SUCCESS' : 'CT_BOOK_DELETED_FILE_WARNING'
+             );
 
- 
-             
-             const message = i18n.getMessage('CT_BOOK_DELETED_SUCCESS');
-             res.json({ message });
+             res.json({ message, fileDeleted });
          }
          catch (error)
          {
@@ -157,7 +163,7 @@
                  return res.status(404).json({ message });
              }
 
-             res.json({ message: 'Metadatos actualizados correctamente.' });
+             res.json({ message: i18n.getMessage('CT_BOOK_METADATA_UPDATED') });
          }
          catch (error)
          {

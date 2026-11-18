@@ -53,7 +53,7 @@
              const adminId = req.userId; 
  
              // Regla de Negocio Semántica: Evitar auto-eliminación
-             if (targetUserId == adminId) 
+             if (Number(targetUserId) === Number(adminId)) 
              {
                  const message = i18n.getMessage('CT_ADMIN_CANT_DELETE_SELF');
                  return res.status(403).json({ message });
@@ -62,39 +62,52 @@
              // Obtener todos los libros cargados por el usuario objetivo antes de borrarlo
              const userBooks = await bookRepository.findByUserId(targetUserId);
              
-             // Eliminar de la base de datos (se produce cascada a nivel de tabla 'books')
-             const success = await userRepository.delete(targetUserId);
- 
-             if (!success) 
+             // El borrado y su evento de auditoría se confirman en una única transacción.
+             const success = await auditRepository.withTransaction(async connection =>
+             {
+                 const deleted = await userRepository.delete(targetUserId, connection);
+
+                 if (deleted)
+                 {
+                     await auditRepository.create({
+                         user_id: adminId,
+                         action: 'DELETE_USER',
+                         target: String(targetUserId),
+                         ip_address: req.ip || null
+                     }, connection);
+                 }
+
+                 return deleted;
+             });
+
+             if (!success)
              {
                  const message = i18n.getMessage('CT_ADMIN_USER_NOT_FOUND');
                  return res.status(404).json({ message });
              }
- 
-             // Esperar el intento de auditoría antes de limpiar los archivos físicos.
-             // Una falla de auditoría se registra, pero no revierte la eliminación de la cuenta.
-             try
+
+             // La transacción SQL ya fue confirmada; contar por separado la limpieza física.
+             let deletedFiles = 0;
+             let failedFiles = 0;
+
+             userBooks.forEach(book =>
              {
-                 await auditRepository.create({
-                     user_id: adminId,
-                     action: 'DELETE_USER',
-                     target: String(targetUserId),
-                     ip_address: req.ip || null
-                 });
-             }
-             catch (error)
-             {
-                 console.error('[Audit] No se pudo registrar DELETE_USER:', error);
-             }
+                 if (fileHelper.deleteFile(book.file_path))
+                 {
+                     deletedFiles++;
+                 }
+                 else
+                 {
+                     failedFiles++;
+                 }
+             });
 
-             // Limpieza física: Eliminar almacenamiento en disco
-             userBooks.forEach(book => {fileHelper.deleteFile(book.file_path);});
+             // Informar cantidades reales, sin confundir libros encontrados con archivos eliminados.
+             const message = i18n.getMessage('CT_ADMIN_USER_DELETED')
+                 .replace('%s', deletedFiles)
+                 .replace('%s', failedFiles);
 
-
- 
-             // Reemplazo dinámico (%s) para mostrar la cantidad de archivos borrados
-             const message = i18n.getMessage('CT_ADMIN_USER_DELETED').replace('%s', userBooks.length);
-             res.json({ message });
+             res.json({ message, deletedFiles, failedFiles });
          } 
          catch (error) 
          {
